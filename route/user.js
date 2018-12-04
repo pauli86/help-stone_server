@@ -21,7 +21,7 @@ app.post('/join',function(req,res){
             console.log(apiName+'duplicate ID or stuNo');
             return res.json({result:4,msg:'ID 또는 학번이 이미 등록되었습니다.'});
         }
-            
+
         crypto.randomBytes(64, (err, buf) => {
             if(err){
                 console.log(apiName+'crypto random bytes error');
@@ -74,15 +74,22 @@ app.post('/login',function(req,res){
             return res.json({result:5,msg:'존재하지 않는 ID 입니다.'});
         }            
         let salt = user.salt;
-        
-        crypto.pbkdf2(pass,salt,100000,64,'sha512',(err,key)=>{                       
+        user.lastLogin = new Date();
+        user.save()
+        .then(crypto.pbkdf2(pass,salt,100000,64,'sha512',(err,key)=>{                       
             if(key.toString('base64')===user.pass){
                 console.log(apiName+'login well');
                 return res.json({result:1,msg:'로그인 되었습니다.',data:user});
             }
             console.log(apiName+'wrong id or password');
-            return res.json({result:4,msg:'로그인에 실패했습니다.'});
-        });
+            throw new Error({msg:'로그인에 실패했습니다.'});
+        }))
+        .catch(e=>{
+            let msg = e.msg?e.msg:'서버에러';
+            console.log(apiName+'user save error');
+            return res.json({result:2,msg:msg});
+        })
+        
     });
 });
 

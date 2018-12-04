@@ -6,21 +6,8 @@ const Schema = mongoose.Schema;
 const doSchema = new Schema({
     did:Number,
     title:String,
-    desc:String,
-    state:String, // yet, done
-    startDate:Date,
-    dueDate:Date,
-    doneDate:Date,    
-    logList:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'log',
-        default:[]
-    }],
-    comments:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'comment',
-        default:[]
-    }],
+    state:String, // yet, done   
+    doneDate:Date
 })
 
 doSchema.plugin(autoIncrement.plugin,{

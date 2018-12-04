@@ -21,6 +21,8 @@ const logSchema = new Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'user'
     },
+    sector:String, // p, t, d, u
+    title:String,
     action:String, // create, retrieve, update, delete
     date:Date,
 });

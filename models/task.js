@@ -17,11 +17,6 @@ const taskSchema = new Schema({
         ref:'do',
         default:[]
     }],
-    logList:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'log',
-        default:[]
-    }],
     comments:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'comment',

@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const app = express.Router();
 
+const User = require('../models/user');
 const Project = require('../models/project');
 const Task = require('../models/task');
 
@@ -40,7 +41,18 @@ app.post('/test',function(req,res){
         if(err){
             return res.json({result:2,msg:'save error'});
         }
-    return res.json({result:1,data:project});
+        User.findOne({uid:1},function(err2,user){
+            if(err2){
+                return res.json({result:2,msg:'user find err'});
+            }
+            user.projectList = [...user.projectList,project];
+            user.save(function(err3){
+                if(err3){
+                    return res.json({result:2,msg:'user update err'});
+                }
+                return res.json({result:1,data:user});
+            });            
+        });        
     });    
 })
 
