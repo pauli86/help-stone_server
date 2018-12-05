@@ -11,6 +11,7 @@ const projectSchema = new Schema({
     startDate:Date,
     dueDate:Date,
     doneDate:Date,
+    lastUpdate:Date,
     manager:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'user'

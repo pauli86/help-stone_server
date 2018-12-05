@@ -11,7 +11,10 @@ const taskSchema = new Schema({
     startDate:Date,
     dueDate:Date,
     doneDate:Date,
-    manager:Number, // user uid
+    user:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'user'
+    }, // user uid
     doList:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'do',
