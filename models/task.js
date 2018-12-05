@@ -5,16 +5,20 @@ const Schema = mongoose.Schema;
 
 const taskSchema = new Schema({
     tid:Number,
+    state:String, // ongoing, done
     title:String,
     desc:String,
     state:String,
-    startDate:Date,
-    dueDate:Date,
+    startDate:Date,    
     doneDate:Date,
     user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'user'
     }, // user uid
+    project:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'project'
+    },
     doList:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'do',

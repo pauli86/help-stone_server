@@ -36,7 +36,8 @@ app.post('/viewAll',function(req,res){
                     return mongoose.Types.ObjectId(o);
                 })
             }
-        }).populate('user');       
+        }).populate({path:'manager',select:'id name email'})
+        .populate({path:'team',select:'id name email'});       
     })
     .then((projects)=>{
         // 프로젝트 매니저 정보, 팀원 정보, 태스크리스트 (진행중,완료) 갯수

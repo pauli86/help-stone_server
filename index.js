@@ -20,6 +20,9 @@ app.all('/*',function(req,res,next){
 
 app.use('/api/user',require('./route/user'));
 app.use('/api/project',require('./route/project'));
+app.use('/api/task',require('./route/task'));
+app.use('/api/todo',require('./route/todo'));
+app.use('/api/log',require('./route/log'));
 
 app.all('/*',function(req,res){
     res.status(404);

@@ -14,8 +14,7 @@ app.post('/join',function(req,res){
     let stuNo = req.body.stuNo?req.body.stuNo:false;
     
     if(!(id&&pass&&name&&stuNo)){
-        console.log(apiName+'parameter check error');
-        return res.json({result:3,msg:'모든 항목을 입력하세요.'});
+        
     }
     User.count({$or:[{id:id},{stuNo:stuNo}]},function(err,cnt){
         if(cnt!=0){
@@ -168,7 +167,7 @@ app.post('/view',function(req,res){
     let manager = req.body.manager?req.body.manager:false;
     let id = req.body.id?req.body.id:false;
     User.count({id:manager})
-    .then((cnt)=>{        
+    .then((cnt)=>{
         if(!cnt){
             console.log(apiName+'invalid project manager id');
             throw new Error('프로젝트 매니저 아이디가 유효하지 않습니다.');
