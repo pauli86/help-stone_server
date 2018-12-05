@@ -144,7 +144,7 @@ app.post('/update',function(req,res){
         {$set:updateQuery},{new:false}).populate({path:'do',model:'do'})
     .then(task=>{
         if(!task){
-            console.log(apiName+' task update error');            
+            console.log(apiName+' task find and update error');            
             throw new Error();
         }
         let content = '';

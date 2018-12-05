@@ -37,37 +37,56 @@ app.post('/viewAll',function(req,res){
                 })
             }
         }).populate({path:'manager',select:'id name email'})
-        .populate({path:'team',select:'id name email'});       
+        .populate({path:'team',select:'id name email'})
+        .populate({path:'taskList',select:'state',populate:{path:'doList',select:'state'}})
+        .populate({path:'logList',select:'sector title action'});
     })
     .then((projects)=>{
         // 프로젝트 매니저 정보, 팀원 정보, 태스크리스트 (진행중,완료) 갯수
         let tasks = [];
         projects.map((project)=>{
-            if(project.state==='done'){
-                data.done.push(project);
-                tasks.push(...project.taskList);
+            if(project.state==='done'){                
+                let totalTaskCnt = project.taskList.length;
+                let doneTaskCnt = 0;
+                let totalDoCnt = 0;
+                let doneDoCnt = 0;
+                
+                project.taskList.map(t=>{
+                    if(t.state==='done'){
+                        doneTaskCnt++;
+                    }
+                    totalDoCnt += t.doList.length;
+                    t.doList.map(d=>{
+                        if(d.state==='done'){
+                            doneDoCnt++;
+                        }
+                    });
+                });
+                let cnt = {totalTaskCnt,doneTaskCnt,totalDoCnt,doneDoCnt};
+                data.ongoing.push({project:project,meta:cnt});
             }else{
-                data.ongoing.push(project);
-            }
+                let totalTaskCnt = project.taskList.length;
+                let doneTaskCnt = 0;
+                let totalDoCnt = 0;
+                let doneDoCnt = 0;
+                
+                project.taskList.map(t=>{
+                    if(t.state==='done'){
+                        doneTaskCnt++;
+                    }
+                    totalDoCnt += t.doList.length;
+                    t.doList.map(d=>{
+                        if(d.state==='done'){
+                            doneDoCnt++;
+                        }
+                    });
+                });
+                let cnt = {totalTaskCnt,doneTaskCnt,totalDoCnt,doneDoCnt};
+                data.ongoing.push({project:project,meta:cnt});
+            }            
         });
-        data.task.total = tasks.length;
-        return Task.find({_id:tasks.map((t)=>{
-            return mongoose.Types.ObjectId(t);
-        })})
-    })
-    .then((tasks)=>{ // task 진행도 전체 카운트
-        let dos = [];
-        tasks.map((task)=>{
-            if(task.state==='done') data.task.done++;
-            dos.push(...task.doList);
-        });
-        data.do.total = dos.length;
-        return Do.count({_id:{$in:dos.map(d=>mongoose.Types.ObjectId(d))},state:'done'})
-    })
-    .then((doneCnt)=>{
-        data.do.done = doneCnt;
         console.log(apiName+' get project info complete');
-        return res.json({result:1,msg:'프로젝트 리스트를 찾았습니다.',data:data});
+        return res.json({result:1,msg:'프로젝트 리스트를 찾았습니다.',data:data});    
     })
     .catch(e=>{
         console.log(apiName+'user find and update error :', e);
