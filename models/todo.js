@@ -5,6 +5,10 @@ const Schema = mongoose.Schema;
 
 const doSchema = new Schema({
     did:Number,
+    project:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'project'
+    },
     user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'user'

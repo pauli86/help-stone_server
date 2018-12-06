@@ -12,8 +12,8 @@ app.post('/join',function(req,res){
     let pass = req.body.pass?req.body.pass:false;
     let name = req.body.name?req.body.name:false;
     let stuNo = req.body.stuNo?req.body.stuNo:false;
-    
-    if(!(id&&pass&&name&&stuNo)){
+    let email = req.body.email?req.body.email:false;
+    if(!(id&&pass&&name&&stuNo&&email)){
         
     }
     User.count({$or:[{id:id},{stuNo:stuNo}]},function(err,cnt){
@@ -38,6 +38,7 @@ app.post('/join',function(req,res){
                 user.pass = key.toString('base64');
                 user.name = name;
                 user.stuNo = stuNo;
+                user.email = email;
                 user.regiDate = new Date();
                 console.log(apiName,user);
                 user.save(function(err){
@@ -46,7 +47,7 @@ app.post('/join',function(req,res){
                         return res.json({result:2,msg:'서버에러'});
                     }
                     console.log(apiName+'join well');
-                    return res.json({result:1,msg:'회원가입이 완료되었습니다.',data:user});
+                    return res.json({result:1,msg:'회원가입이 완료되었습니다.',data:{id:user.id,name:user.name,stuNo:user.stuNo}});
                 });
             });
         });        
@@ -166,25 +167,29 @@ app.post('/view',function(req,res){
     console.log(apiName);
     let manager = req.body.manager?req.body.manager:false;
     let id = req.body.id?req.body.id:false;
+    let errMsg = '';
     User.count({id:manager})
     .then((cnt)=>{
         if(!cnt){
             console.log(apiName+'invalid project manager id');
-            throw new Error('프로젝트 매니저 아이디가 유효하지 않습니다.');
+            errMsg = '프로젝트 매니저 아이디가 유효하지 않습니다.';
+            throw new Error();
         }
         console.log(apiName+'manager id valid');
         return User.findOne({id:id},{salt:0,pass:0})
     })
     .then((user)=>{
         if(!user){
+            errMsg = '유저 아이디가 유효하지 않습니다.';
             console.log(apiName+'invalid user id');
-            throw new Error('유저 아이디가 유효하지 않습니다.');
+            throw new Error();
         }
         console.log(apiName+'user id valid');
         return res.json({result:1,msg:'유저 정보를 찾았습니다.',data:user})
     })
     .catch(e=>{
-        let msg = e?e:'서버에러';        
+        console.log(e);
+        let msg = errMsg!==''?errMsg:'서버에러';        
         console.log(apiName+'user find error');
         return res.json({result:2,msg:msg});
     })
