@@ -16,6 +16,8 @@ app.post('/join',function(req,res){
     if(!(id&&pass&&name&&stuNo&&email)){
         
     }
+    id = id.toLowerCase();
+    
     User.count({$or:[{id:id},{stuNo:stuNo}]},function(err,cnt){
         if(cnt!=0){
             console.log(apiName+'duplicate ID or stuNo');
@@ -59,6 +61,7 @@ app.post('/login',function(req,res){
     console.log(apiName);
     let id = req.body.id?req.body.id:false;
     let pass = req.body.pass?req.body.pass:false;
+    id = id.toLowerCase();
 
     if(!(id&&pass)){
         console.log(apiName+'parameter check error');
@@ -129,6 +132,7 @@ app.post('/resetPW',function(req,res){
     let stuNo = req.body.stuNo?req.body.stuNo:false;
     let name = req.body.name?req.body.name:false;
     let pass = req.body.pw?req.body.pw:false;
+    id = id.toLowerCase();
     if(!(id&&stuNo&&name&&pass)){
         console.log(apiName+'parameter check error');
         return res.json({result:3,msg:'모든 정보를 입력하세요.'});
@@ -168,6 +172,8 @@ app.post('/view',function(req,res){
     let manager = req.body.manager?req.body.manager:false;
     let id = req.body.id?req.body.id:false;
     let errMsg = '';
+    id = id.toLowerCase();
+    manager = manager.toLowerCase();
     User.count({id:manager})
     .then((cnt)=>{
         if(!cnt){
@@ -192,6 +198,29 @@ app.post('/view',function(req,res){
         let msg = errMsg!==''?errMsg:'서버에러';        
         console.log(apiName+'user find error');
         return res.json({result:2,msg:msg});
+    })
+})
+
+app.post('/projectChk',function(req,res){
+    const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ PROJECT CHECK ] ';
+    console.log(apiName);
+    let id = req.body.id?req.body.id:false;
+    let lastUpdate = req.body.lastUpdate?req.body.lastUpdate:false;
+    if(!(id&&lastUpdate)){
+        console.log(apiName+'parameter error ',req.body);
+        return res.json({result:3,msg:'파라미터가 없습니다.'});
+    }
+    User.count({id:id,lastUpdate:{$gt:lastUpdate}})
+    .then(cnt=>{
+        if(!cnt){
+            return res.json({result:1,msg:'변경사항없음'});
+        }else{
+            return res.json({result:4,msg:'새로운 프로젝트가 프로젝트 리스트에 추가되었습니다.'});
+        }
+    })
+    .catch(e=>{
+        console.log(apiName+'error : ',e);
+        return res.json({result:5,msg:'서버에러'});
     })
 })
 

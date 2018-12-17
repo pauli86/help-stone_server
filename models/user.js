@@ -13,6 +13,7 @@ const userSchema = new Schema({
     stuNo:String,
     regiDate:Date,
     lastLogin:Date,
+    lastUpdate:Number,
     email:String,
     msgList:[{
         type:mongoose.Schema.Types.ObjectId,

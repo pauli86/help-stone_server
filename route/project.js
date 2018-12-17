@@ -189,7 +189,16 @@ app.post('/add',function(req,res){
             console.log(u);
             return mongoose.Types.ObjectId(u);
         })
-    }},{$push:{projectList:project._id}},{multi:true})
+    }},{       
+        $push:{
+            projectList:project._id
+        },
+        $set:{
+            lastUpdate :(new Date()).getTime()
+        }
+    },{
+        multi:true
+    })
     .then((result)=>{
         if(!result.ok){
             console.log(apiName+' user project list update error');            
@@ -225,8 +234,6 @@ app.post('/add',function(req,res){
             console.log('project saved');
 //            return project.save();
         })
-        
-        
     })    
     .then((result)=>{
         if(!result){
@@ -402,6 +409,7 @@ app.post('/delete',function(req,res){
     })
     .then(result=>{
         console.log(apiName+' project has been removed.');  
+        log.save();
         return res.json({result:1,msg:'프로젝트가 삭제되었습니다.',data:result});
     })    
     .catch(e=>{
