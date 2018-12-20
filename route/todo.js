@@ -29,6 +29,7 @@ app.post('/add',function(req,res){
     
     
     let log = new Log();
+    
     log.do = todo._id;
     log.sector = 'do';
     log.title = title;
@@ -47,6 +48,7 @@ app.post('/add',function(req,res){
             throw new Error();
         }
         todo.project = task.project;
+        todo.task = task._id;
         todo.save();
 
         log.project = task.project;
@@ -117,13 +119,14 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
                 content = todo.title + ' -> ' + title;
                 break;
             case 'state':
-                content = todo.state + ' -> ' + state;
+                content = todo.title+' : ' + todo.state + ' -> ' + state;
                 break;
         }
         let log = new Log();
         log.do = todo._id;
         log.project = todo.project;
         log.user = todo.user;
+        log.task = todo.task;
         log.sector = 'do';
         log.title = content;
         log.action = 'update';
@@ -174,6 +177,7 @@ app.post('/delete',function(req,res){ // Do collection 에서 지우고 로그 �
     .then(todo=>{
         let log = new Log();
         log.do = todo._id;
+        log.task = todo.task;
         log.project = todo.project;
         log.user = todo.user;
         log.sector = 'do';

@@ -52,6 +52,7 @@ app.post('/add',function(req,res){
         
         let log = new Log();
         log.project = project._id;
+        log.user = uid;
         log.task = task._id;
         log.sector = 'task';
         log.title = task.title;
@@ -99,7 +100,7 @@ app.post('/view',function(req,res){
         return res.json({result:3,msg:'모든 항목을 입력하세요.'});
     }
     Task.find({project:mongoose.Types.ObjectId(pid),user:mongoose.Types.ObjectId(uid)})
-    .populate({path:'do',model:'do'})
+    .populate({path:'doList',model:'do'})
     .then(tasks=>{
         if(!tasks){
             console.log(apiName+'task populate error');
@@ -141,7 +142,7 @@ app.post('/update',function(req,res){
         return res.json({result:3,msg:'모든 항목을 입력하세요.'});
     }
     Task.findOneAndUpdate({_id:mongoose.Types.ObjectId(tid),user:mongoose.Types.ObjectId(uid)},
-        {$set:updateQuery},{new:false}).populate({path:'do',model:'do'})
+        {$set:updateQuery},{new:false}).populate({path:'doList',model:'do'})
     .then(task=>{
         if(!task){
             console.log(apiName+' task find and update error');            
@@ -153,6 +154,9 @@ app.post('/update',function(req,res){
             case 'state':
             content = '상태 : '+ task.state + ' -> ' +state;
             task.state = state;
+            if(task.state==='done'){
+                task.doneDate = new Date();
+            }
             break;
             case 'title':
             content = '태스크명 : '+ task.title + ' -> ' +title;
@@ -168,7 +172,7 @@ app.post('/update',function(req,res){
         log.project = task.project;
         log.task = task._id;
         log.sector = 'task';
-
+        log.user = uid;
         log.title = content;
         log.action = 'update';
         log.date = new Date();
@@ -207,7 +211,7 @@ app.post('/delete',function(req,res){
         log.project = task.project;
         log.task = task._id;
         log.sector = 'task';
-
+        log.user = uid;
         log.title = task.title;
         log.action = 'delete';
         log.date = new Date();

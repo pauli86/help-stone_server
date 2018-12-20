@@ -104,7 +104,13 @@ app.post('/view',function(req,res){
     .populate({path:'manager',select:'name id email'})
     .populate({path:'team',select:'name id email'})
     .populate({path:'taskList',model:'task'})
-    .populate({path:'logList',model:'log'})
+    .populate({path:'logList',populate:[{
+                path:'user',
+                select:'name'
+            },{
+                path:'task',
+                select:'title'
+            }]})
     .then((project)=>{
         if(!project){
             console.log(apiName+'project find error');
@@ -208,6 +214,7 @@ app.post('/add',function(req,res){
         log.project = project._id;
         log.sector = 'project';
         log.title = project.title;
+        log.user = manager;
         log.action = 'create';
         log.date = new Date();
         log.save();        
@@ -224,7 +231,7 @@ app.post('/add',function(req,res){
                 log.project = project._id;
                 log.user = u._id;
                 log.sector = 'user';
-                log.title = u.name + '('+u.id+')';
+                log.title = u.name + '( '+u.id+' )';
                 log.action = 'join';
                 log.date = new Date();
                 log.save();                
@@ -279,6 +286,7 @@ app.post('/update',function(req,res){
         {new:true}
     )
     .then(async (project)=>{
+        log.user = project.manager;
         console.log(project);
         if(!project){
             console.log(apiName+'project find error');
@@ -286,8 +294,8 @@ app.post('/update',function(req,res){
             throw new Error();
         }
         if(title){ // 제목 변경
-            log.project = project._id;
-            log.sector = 'project';
+            log.project = project._id;            
+            log.sector = 'project';            
             log.title = '프로젝트명 - "'+project.title+'" -> "'+title+'"';
             log.action = 'update';
             log.save();
@@ -424,7 +432,7 @@ app.post('/timechk',function(req,res){
     console.log(apiName);
     let pid = req.body.pid?req.body.pid:false;
     let cTime = req.body.cTime?req.body.cTime:false;
-    
+    let errMsg = '';
 
     if(!(pid&&cTime)){
         console.log(apiName+'parameter check error');
@@ -439,7 +447,9 @@ app.post('/timechk',function(req,res){
     .then((cnt)=>{
         if(!cnt){ // 변경사항 없는것
             console.log(apiName+' no change');
-            return res.json({result:1,msg:'업데이트 없음'});
+            // return res.json({result:1,msg:'업데이트 없음'});
+            errMsg = '업데이트 없음';
+            throw new Error();
         }else{
             console.log(apiName+ ' update');
             return Project.findOne({_id:pid})
@@ -459,9 +469,10 @@ app.post('/timechk',function(req,res){
         return res.json({result:7,msg:'업데이트 완료',data:project});
     })
     .catch((e)=>{        
+        let result = errMsg==='업데이트 없음'?1:2;
         let msg = errMsg!==''?errMsg:'서버에러';
         console.log(apiName+'project error catch',e);
-        return res.json({result:2,msg:msg});
+        return res.json({result:result,msg:msg});
     });
 })
 
