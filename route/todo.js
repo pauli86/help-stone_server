@@ -14,6 +14,7 @@ app.post('/add',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ DO ][ ADD ] ';
     console.log(apiName);
     let errMsg = '';    
+    let mystate = '추가';
     let uid = req.body.uid?req.body.uid:false;
     let tid = req.body.tid?req.body.tid:false;
     let title = req.body.title?req.body.title:false;
@@ -33,7 +34,7 @@ app.post('/add',function(req,res){
     log.do = todo._id;
     log.sector = 'do';
     log.title = title;
-    log.action = 'create';
+    log.action = mystate;
     log.date = new Date();
     
 
@@ -87,7 +88,7 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
     let did = req.body.did?req.body.did:false;    
     let title = req.body.title?req.body.title:false;
     let state = req.body.state?req.body.state:false;
-
+    let mystate = '수정';
     
     if(!(did&&(state||title))){
         console.log(apiName+'parameter check error');
@@ -103,9 +104,14 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
         flag = 'title';
     }
     if(state){
-        if(state==='done') Object.assign(query,{doneDate:new Date()});
-        Object.assign(query,{state:state});
+        if(state==='done'){
+            Object.assign(query,{doneDate:new Date()});
+            mystate = '완료';
+        }else{
+            Object.assign(query,{state:state});
+        }        
         flag = 'state';
+        
     }
     Do.findOneAndUpdate({
         _id:mongoose.Types.ObjectId(did)
@@ -129,7 +135,7 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
         log.task = todo.task;
         log.sector = 'do';
         log.title = content;
-        log.action = 'update';
+        log.action = mystate;
         log.date = new Date();
         log.save();
         ret.prev = todo;
@@ -162,7 +168,7 @@ app.post('/delete',function(req,res){ // Do collection 에서 지우고 로그 �
     const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ DO ][ DELETE ] ';
     console.log(apiName);
     let did = req.body.did?req.body.did:false;
-    
+    let mystate = '삭제';    
 
     if(!(did)){
         console.log(apiName+'project find error');
@@ -182,7 +188,7 @@ app.post('/delete',function(req,res){ // Do collection 에서 지우고 로그 �
         log.user = todo.user;
         log.sector = 'do';
         log.title = todo.title;
-        log.action = 'delete';
+        log.action = mystate;
         log.date = new Date();
         log.save();
         return Project.updateOne({

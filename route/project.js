@@ -96,14 +96,17 @@ app.post('/viewAll',function(req,res){
 
 app.post('/view',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ VIEW ] ';
-    console.log(apiName);
+    console.log(apiName);    
     let pid = req.body.pid?req.body.pid:false;
     let data = {};
     let errMsg ='';
     Project.findOne({_id:pid})
     .populate({path:'manager',select:'name id email'})
     .populate({path:'team',select:'name id email'})
-    .populate({path:'taskList',model:'task'})
+    .populate({path:'taskList',populate:{
+                path:'doList',
+                select:'state'
+    }})
     .populate({path:'logList',populate:[{
                 path:'user',
                 select:'name'
@@ -117,7 +120,23 @@ app.post('/view',function(req,res){
             errMsg ='프로젝트를 찾을 수 없습니다';
             throw new Error();
         }
-        Object.assign(data,{project:project});
+        let totalTaskCnt = project.taskList.length;
+        let doneTaskCnt = 0;
+        let totalDoCnt = 0;
+        let doneDoCnt = 0;                
+        project.taskList.map(t=>{
+            if(t.state==='done'){
+                doneTaskCnt++;
+            }
+            totalDoCnt += t.doList.length;
+            t.doList.map(d=>{
+                if(d.state==='done'){
+                    doneDoCnt++;
+                }
+            });
+        });
+        let cnt = {totalTaskCnt,doneTaskCnt,totalDoCnt,doneDoCnt};
+        Object.assign(data,{project:project,meta:cnt});
 
     //     return User.findOne({_id:project.manager})
     // })
@@ -167,6 +186,7 @@ app.post('/view',function(req,res){
 app.post('/add',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ ADD ] ';
     console.log(apiName);
+    let mystate = '생성';
     let errMsg = '';
     let title = req.body.title?req.body.title:false;
     let dueDate = req.body.dueDate?req.body.dueDate:false;
@@ -188,7 +208,7 @@ app.post('/add',function(req,res){
     project.manager = manager;
     project.team = team;
     let users = [];
-    users.push(...team,manager);
+    users.push(manager,...team);
     console.log(users);
     User.update({_id:{
         $in:users.map(u=>{
@@ -215,7 +235,7 @@ app.post('/add',function(req,res){
         log.sector = 'project';
         log.title = project.title;
         log.user = manager;
-        log.action = 'create';
+        log.action = mystate;
         log.date = new Date();
         log.save();        
         project.logList.push(log._id);
@@ -232,7 +252,7 @@ app.post('/add',function(req,res){
                 log.user = u._id;
                 log.sector = 'user';
                 log.title = u.name + '( '+u.id+' )';
-                log.action = 'join';
+                log.action = '참여';
                 log.date = new Date();
                 log.save();                
                 project.logList.push(log._id);
@@ -262,6 +282,7 @@ app.post('/update',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ UPDATE ] ';
     console.log(apiName);
     let errMsg = '';
+    let mystate = '수정';
     let pid = req.body.pid?req.body.pid:false;
     let title = req.body.title?req.body.title:false; // 그냥 수정
     let desc = req.body.desc?req.body.desc:false; // 그냥 수정
@@ -297,7 +318,7 @@ app.post('/update',function(req,res){
             log.project = project._id;            
             log.sector = 'project';            
             log.title = '프로젝트명 - "'+project.title+'" -> "'+title+'"';
-            log.action = 'update';
+            log.action = '제목 '+mystate;
             log.save();
             project.title = title;
             project.logList.push(log._id);
@@ -305,7 +326,7 @@ app.post('/update',function(req,res){
             log.project = project._id;
             log.sector = 'project';
             log.title = '프로젝트 설명 - "'+project.desc+'" -> "'+desc+'"';
-            log.action = 'update';
+            log.action = '설명 '+mystate;
             log.save();
             project.desc = desc;
             project.logList.push(log._id);
@@ -313,7 +334,7 @@ app.post('/update',function(req,res){
             log.project = project._id;
             log.sector = 'project';
             log.title = '프로젝트 마감일 - "'+(new Date(project.dueDate)).toLocaleDateString()+'" -> "'+(new Date(dueDate)).toLocaleDateString()+'"';
-            log.action = 'update';
+            log.action = '마감일 '+mystate;
             log.save();
             project.dueDate = new Date(dueDate);
             project.logList.push(log._id);
@@ -334,7 +355,7 @@ app.post('/update',function(req,res){
             log.project = project._id;
             log.sector = 'user';
             log.title = user.name + '('+user.id+')';
-            log.action = 'join';
+            log.action = '참여';
             log.save();
             project.team.push(addTeam);
             project.logList.push(log._id);            
@@ -355,7 +376,7 @@ app.post('/update',function(req,res){
             log.project = project._id;
             log.sector = 'user';
             log.title = user.name + '('+user.id+')';
-            log.action = 'out';
+            log.action = '제외';
             log.save();
             let idx = project.team.indexOf(removeTeam);
             project.team.splice(idx,1);
@@ -386,10 +407,10 @@ app.post('/delete',function(req,res){
     let taskList = [];
     let doList = [];
     let errMsg = '';
-    
+    let mystate = '삭제';
     let log = new Log();
     log.date = new Date();
-    log.action = 'delete';
+    log.action = mystate;
     log.sector = 'project';
     log.user = manager;
 

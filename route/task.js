@@ -19,7 +19,7 @@ app.post('/add',function(req,res){
     let desc = req.body.desc?req.body.desc:false;
     let uid = req.body.uid?req.body.uid:false;
     let pid = req.body.pid?req.body.pid:false;
-    
+    let mystate = '추가';
 
     if(!(title&&desc&&uid&&pid)){
         console.log(apiName+'parameter check error');
@@ -56,7 +56,7 @@ app.post('/add',function(req,res){
         log.task = task._id;
         log.sector = 'task';
         log.title = task.title;
-        log.action = 'create';
+        log.action = mystate;
         log.date = new Date();
         log.save();        
         project.logList.push(log._id);        
@@ -125,8 +125,8 @@ app.post('/update',function(req,res){
     let title = req.body.title?req.body.title:false;
     let desc = req.body.desc?req.body.desc:false;
     let state = req.body.state?req.body.state:false;
-    let updateQuery = {}
-    
+    let updateQuery = {}    
+    let mystate = '수정';
     
     if(title){
         Object.assign(updateQuery,{title:title});    
@@ -135,7 +135,13 @@ app.post('/update',function(req,res){
         Object.assign(updateQuery,{desc:desc});
     }
     if(state){
-        Object.assign(updateQuery,{state:state});
+        if(state === 'done'){
+            let doneDate = new Date();
+            mystate = '완료';
+            Object.assign(updateQuery,{state:state,doneDate:doneDate});
+        }else{
+            Object.assign(updateQuery,{state:state});
+        }
     }
     if(!((uid&&tid)&&(title||desc||state))){
         console.log(apiName+'parameter check error');
@@ -153,10 +159,7 @@ app.post('/update',function(req,res){
         switch(updateFlag){
             case 'state':
             content = '상태 : '+ task.state + ' -> ' +state;
-            task.state = state;
-            if(task.state==='done'){
-                task.doneDate = new Date();
-            }
+            task.state = state;            
             break;
             case 'title':
             content = '태스크명 : '+ task.title + ' -> ' +title;
@@ -174,15 +177,18 @@ app.post('/update',function(req,res){
         log.sector = 'task';
         log.user = uid;
         log.title = content;
-        log.action = 'update';
+        log.action = mystate;
         log.date = new Date();
         log.save();        
         Project.findOneAndUpdate({
             _id:mongoose.Types.ObjectId(task.project)
         },{
             $push:{logList:log._id}
+        },function(err,ret){
+            if(err)return res.json({result:2,msg:'태스크 업데이트 실패',data:task});
+            return res.json({result:1,msg:'태스크 업데이트 완료',data:task});
         });
-        return res.json({result:1,msg:'태스크 업데이트 완료',data:task});
+        
     })
     .catch(e=>{
         console.log(e);
@@ -195,6 +201,7 @@ app.post('/delete',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ DELETE ] ';
     console.log(apiName);
     let errMsg = '';    
+    let mystate = '삭제';
     let uid = req.body.uid?req.body.uid:false;
     let tid = req.body.tid?req.body.tid:false;
     if(!(uid&&tid)){
@@ -213,7 +220,7 @@ app.post('/delete',function(req,res){
         log.sector = 'task';
         log.user = uid;
         log.title = task.title;
-        log.action = 'delete';
+        log.action = mystate;
         log.date = new Date();
         log.save();        
         Project.findOneAndUpdate({
