@@ -13,7 +13,7 @@ const Log = require('../models/log');
 
 app.post('/add',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ ADD ] ';
-    console.log(apiName);
+    // console.log(apiName);
     let errMsg = '';
     let title = req.body.title?req.body.title:false;
     let desc = req.body.desc?req.body.desc:false;
@@ -22,7 +22,7 @@ app.post('/add',function(req,res){
     let mystate = '추가';
 
     if(!(title&&desc&&uid&&pid)){
-        console.log(apiName+'parameter check error');
+        // console.log(apiName+'parameter check error');
         return res.json({result:3,msg:'모든 항목을 입력하세요.'});
     }
     Project.findOneAndUpdate({
@@ -32,7 +32,7 @@ app.post('/add',function(req,res){
     })
     .then(project=>{
         if(!project){
-            console.log(apiName+'project find error');
+            // console.log(apiName+'project find error');
             errMsg ='프로젝트를 찾을 수 없습니다';
             throw new Error();
         }
@@ -46,8 +46,11 @@ app.post('/add',function(req,res){
         project.taskList.push(task._id);
         
         User.findByIdAndUpdate({_id:mongoose.Types.ObjectId(uid)},{$push:{taskList:task}},function(err,user){
-            if(err)console.log(apiName+' user tasklist add error');
-            else console.log(apiName+'task listed in user taskList');
+            if(err){
+                // console.log(apiName+' user tasklist add error');
+            }else{ 
+                // console.log(apiName+'task listed in user taskList');
+            }
         });
         
         let log = new Log();
@@ -65,7 +68,7 @@ app.post('/add',function(req,res){
     })
     .then(project=>{
         if(!project){
-            console.log(apiName+'project save error');
+            // console.log(apiName+'project save error');
             throw new Error();
         }
         return Project.findOne({_id:pid})
@@ -76,14 +79,14 @@ app.post('/add',function(req,res){
     })    
     .then(project=>{
         if(!project){
-            console.log(apiName+'project populate error');
+            // console.log(apiName+'project populate error');
             throw new Error();
         }
-        console.log(apiName+' add task complete');
+        // console.log(apiName+' add task complete');
         return res.json({result:1,msg:'태스크 생성 완료',data:project});
     })
     .catch(e=>{
-        console.log(e);
+        // console.log(e);
         let msg = errMsg!==''?errMsg:'서버에러';
         return res.json({result:2,msg:msg});
     });
@@ -91,26 +94,26 @@ app.post('/add',function(req,res){
 
 app.post('/view',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ VIEW ] ';
-    console.log(apiName);
+    // console.log(apiName);
     let errMsg = '';    
     let uid = req.body.uid?req.body.uid:false;
     let pid = req.body.pid?req.body.pid:false;
     if(!(uid&&pid)){
-        console.log(apiName+'parameter check error');
+        // console.log(apiName+'parameter check error');
         return res.json({result:3,msg:'모든 항목을 입력하세요.'});
     }
     Task.find({project:mongoose.Types.ObjectId(pid),user:mongoose.Types.ObjectId(uid)})
     .populate({path:'doList',model:'do'})
     .then(tasks=>{
         if(!tasks){
-            console.log(apiName+'task populate error');
+            // console.log(apiName+'task populate error');
             throw new Error();
         }
-        console.log(apiName+' tasks found');
+        // console.log(apiName+' tasks found');
         return res.json({result:1,msg:'태스크정보 조회 완료',data:tasks});
     })
     .catch(e=>{
-        console.log(e);
+        // console.log(e);
         let msg = errMsg!==''?errMsg:'서버에러';
         return res.json({result:2,msg:msg});
     });
@@ -118,7 +121,7 @@ app.post('/view',function(req,res){
 
 app.post('/update',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ UPDATE ] ';
-    console.log(apiName);
+    // console.log(apiName);
     let errMsg = '';    
     let uid = req.body.uid?req.body.uid:false;
     let tid = req.body.tid?req.body.tid:false;
@@ -143,14 +146,14 @@ app.post('/update',function(req,res){
         }       
     }
     if(!((uid&&tid)&&(title||desc||state))){
-        console.log(apiName+'parameter check error');
+        // console.log(apiName+'parameter check error');
         return res.json({result:3,msg:'모든 항목을 입력하세요.'});
     }
     Task.findOneAndUpdate({_id:mongoose.Types.ObjectId(tid),user:mongoose.Types.ObjectId(uid)},
         {$set:updateQuery},{new:false}).populate({path:'doList',model:'do'})
     .then(task=>{
         if(!task){
-            console.log(apiName+' task find and update error');            
+            // console.log(apiName+' task find and update error');            
             throw new Error();
         }
         let content = '';
@@ -191,7 +194,7 @@ app.post('/update',function(req,res){
         
     })
     .catch(e=>{
-        console.log(e);
+        // console.log(e);
         let msg = errMsg!==''?errMsg:'서버에러';
         return res.json({result:2,msg:msg});
     });
@@ -199,19 +202,19 @@ app.post('/update',function(req,res){
 
 app.post('/delete',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ DELETE ] ';
-    console.log(apiName);
+    // console.log(apiName);
     let errMsg = '';    
     let mystate = '삭제';
     let uid = req.body.uid?req.body.uid:false;
     let tid = req.body.tid?req.body.tid:false;
     if(!(uid&&tid)){
-        console.log(apiName+'parameter check error');
+        // console.log(apiName+'parameter check error');
         return res.json({result:3,msg:'모든 항목을 입력하세요.'});
     }
     Task.findOneAndRemove({_id:mongoose.Types.ObjectId(tid),user:mongoose.Types.ObjectId(uid)})
     .then(task=>{        
         if(!task){
-            console.log(apiName+' task delete error');            
+            // console.log(apiName+' task delete error');            
             throw new Error();
         }
         let log = new Log();
@@ -230,14 +233,14 @@ app.post('/delete',function(req,res){
             $push:{logList:log._id}
         });
         // if(!result.n){
-        //     console.log(apiName+'not found',result);
+        //     // console.log(apiName+'not found',result);
         //     return res.json({result:1,msg:'존재하지 않는 태스크'});    
         // }
-        console.log(apiName+'task delete complete',result);
+        // console.log(apiName+'task delete complete',result);
         return res.json({result:1,msg:'태스크 삭제 완료'});
     })
     .catch(e=>{
-        console.log(e);
+        // console.log(e);
         let msg = errMsg!==''?errMsg:'서버에러';
         return res.json({result:2,msg:msg});
     });

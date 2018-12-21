@@ -12,14 +12,14 @@ const Log = require('../models/log');
 
 app.post('/add',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ DO ][ ADD ] ';
-    console.log(apiName);
+    // console.log(apiName);
     let errMsg = '';    
     let mystate = '추가';
     let uid = req.body.uid?req.body.uid:false;
     let tid = req.body.tid?req.body.tid:false;
     let title = req.body.title?req.body.title:false;
     if(!(uid&&tid&&title)){
-        console.log(apiName+'parameter check error');
+        // console.log(apiName+'parameter check error');
         return res.json({result:3,msg:'모든 항목을 입력하세요.'});
     }
     let todo = new Do();
@@ -45,7 +45,7 @@ app.post('/add',function(req,res){
     })
     .then(task=>{
         if(!task){
-            console.log(apiName+' task find and update error');            
+            // console.log(apiName+' task find and update error');            
             throw new Error();
         }
         todo.project = task.project;
@@ -61,7 +61,9 @@ app.post('/add',function(req,res){
         },{
             $push:{doList:todo}
         },function(err){
-            if(err)console.log(apiName+'user do list find and update error');
+            if(err){
+                // console.log(apiName+'user do list find and update error');
+            }
         });
         log.save();
         Project.findOneAndUpdate({
@@ -70,13 +72,15 @@ app.post('/add',function(req,res){
             $set:{lastUpdate:new Date()},
             $push:{logList:log._id}
         },function(err){
-            if(err)console.log(apiName+'project log find and update error');
+            if(err){
+                // console.log(apiName+'project log find and update error');
+            }
         });
-        console.log(apiName+'project log find and update error')
+        // console.log(apiName+'project log find and update complete')
         return res.json({result:1,msg:'할일 생성 완료',data:todo});
     })    
     .catch(e=>{
-        console.log(e);
+        // console.log(e);
         let msg = errMsg!==''?errMsg:'서버에러';
         return res.json({result:2,msg:msg});
     })
@@ -84,7 +88,7 @@ app.post('/add',function(req,res){
 
 app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일경우 done date
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ DO ][ UPDATE ] ';
-    console.log(apiName);
+    // console.log(apiName);
     let errMsg = '';    
     let did = req.body.did?req.body.did:false;    
     let title = req.body.title?req.body.title:false;
@@ -92,7 +96,7 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
     let mystate = '수정';
     
     if(!(did&&(state||title))){
-        console.log(apiName+'parameter check error');
+        // console.log(apiName+'parameter check error');
         return res.json({result:3,msg:'모든 항목을 입력하세요.'});
     }
 
@@ -150,17 +154,17 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
         })
     })
     .then(result=>{
-        console.log(apiName + 'result :',result);
+        // console.log(apiName + 'result :',result);
         if(!result){
-            console.log(apiName+' todo update error');            
+            // console.log(apiName+' todo update error');            
             throw new Error();
         }
-        console.log(apiName+' todo update complete');
+        // console.log(apiName+' todo update complete');
         return res.json({result:1,msg:'할일 업데이트 완료',data:ret});
     })
     .catch((e)=>{        
         let msg = errMsg!==''?errMsg:'서버에러';
-        console.log(apiName+'todo error catch',e);
+        // console.log(apiName+'todo error catch',e);
         return res.json({result:2,msg:msg});
     });
     
@@ -168,12 +172,12 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
 
 app.post('/delete',function(req,res){ // Do collection 에서 지우고 로그 남기기
     const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ DO ][ DELETE ] ';
-    console.log(apiName);
+    // console.log(apiName);
     let did = req.body.did?req.body.did:false;
     let mystate = '삭제';    
 
     if(!(did)){
-        console.log(apiName+'project find error');
+        // console.log(apiName+'project find error');
         errMsg ='프로젝트를 찾을 수 없습니다';
         throw new Error();
     }
@@ -202,17 +206,17 @@ app.post('/delete',function(req,res){ // Do collection 에서 지우고 로그 �
 
     })
     .then(result=>{
-        console.log(apiName + 'result :',result);
+        // console.log(apiName + 'result :',result);
         if(!result){
-            console.log(apiName+' todo delete error');            
+            // console.log(apiName+' todo delete error');            
             throw new Error();
         }
-        console.log(apiName+' todo delete complete');
+        // console.log(apiName+' todo delete complete');
         return res.json({result:1,msg:'할일 삭제 완료',data:result});
     })
     .catch((e)=>{        
         let msg = errMsg!==''?errMsg:'서버에러';
-        console.log(apiName+'todo error catch',e);
+        // console.log(apiName+'todo error catch',e);
         return res.json({result:2,msg:msg});
     });
 

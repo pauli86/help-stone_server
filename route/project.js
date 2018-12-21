@@ -10,7 +10,7 @@ const Do = require('../models/todo');
 
 app.post('/viewAll',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ VIEW ALL ] ';
-    console.log(apiName);
+    // console.log(apiName);
     let uid = req.body.uid?req.body.uid:false;
     let data = {
         task:{
@@ -25,7 +25,7 @@ app.post('/viewAll',function(req,res){
         done:[]        
     };
     if(!uid){
-        console.log(apiName+'parameter check error');
+        // console.log(apiName+'parameter check error');
         return res.json({result:3,msg:'서버 에러'});
     }
     User.findOne({_id:mongoose.Types.ObjectId(uid)})
@@ -85,18 +85,18 @@ app.post('/viewAll',function(req,res){
                 data.ongoing.push({project:project,meta:cnt});
             }            
         });
-        console.log(apiName+' get project info complete');
+        // console.log(apiName+' get project info complete');
         return res.json({result:1,msg:'프로젝트 리스트를 찾았습니다.',data:data});    
     })
     .catch(e=>{
-        console.log(apiName+'user find and update error :', e);
+        // console.log(apiName+'user find and update error :', e);
         return res.json({result:2,msg:'서버 에러'});
     });    
 });
 
 app.post('/view',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ VIEW ] ';
-    console.log(apiName);    
+    // console.log(apiName);    
     let pid = req.body.pid?req.body.pid:false;
     let data = {};
     let errMsg ='';
@@ -116,9 +116,9 @@ app.post('/view',function(req,res){
             }]})
     .then((project)=>{
         if(!project){
-            console.log(apiName+'project find error');
+            // console.log(apiName+'project find error');
             errMsg ='프로젝트를 찾을 수 없습니다';
-            throw new Error();
+            throw new Error('no project');
         }
         let totalTaskCnt = project.taskList.length;
         let doneTaskCnt = 0;
@@ -178,14 +178,14 @@ app.post('/view',function(req,res){
     })
     .catch((e)=>{        
         let msg = errMsg!==''?errMsg:'서버에러';
-        console.log(apiName+'project error catch',e);
+        // console.log(apiName+'project error catch',e);
         return res.json({result:2,msg:msg});
     });
 })
 
 app.post('/add',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ ADD ] ';
-    console.log(apiName);
+    // console.log(apiName);
     let mystate = '생성';
     let errMsg = '';
     let title = req.body.title?req.body.title:false;
@@ -195,7 +195,7 @@ app.post('/add',function(req,res){
     let team = req.body.team?req.body.team:[];
 
     if(!(title&&dueDate&&desc&&manager)){
-        console.log(apiName+'parameter check error');
+        // console.log(apiName+'parameter check error');
         return res.json({result:3,msg:'모든 항목을 입력하세요.'});
     }
     let project = new Project();
@@ -209,10 +209,10 @@ app.post('/add',function(req,res){
     project.team = team;
     let users = [];
     users.push(manager,...team);
-    console.log(users);
+    // console.log(users);
     User.update({_id:{
         $in:users.map(u=>{
-            console.log(u);
+            // console.log(u);
             return mongoose.Types.ObjectId(u);
         })
     }},{       
@@ -227,8 +227,8 @@ app.post('/add',function(req,res){
     })
     .then((result)=>{
         if(!result.ok){
-            console.log(apiName+' user project list update error');            
-            throw new Error();
+            // console.log(apiName+' user project list update error');            
+            throw new Error('user project list update err');
         }
         let log = new Log();
         log.project = project._id;
@@ -256,23 +256,23 @@ app.post('/add',function(req,res){
                 log.date = new Date();
                 log.save();                
                 project.logList.push(log._id);
-                console.log(u.name,' - log ok');
+                // console.log(u.name,' - log ok');
             });
-            console.log('project saved');
+            // console.log('project saved');
 //            return project.save();
         })
     })    
     .then((result)=>{
         if(!result){
-            console.log(apiName+' project save error');            
-            throw new Error();
+            // console.log(apiName+' project save error');            
+            throw new Error('project save err');
         }      
         project.save();  
-        console.log(apiName+' new project add complete');
+        // console.log(apiName+' new project add complete');
         return res.json({result:1,msg:'프로젝트를 생성하였습니다.',data:project});
     })
     .catch(e=>{
-        console.log(e);
+        // console.log(e);
         let msg = errMsg!==''?errMsg:'서버에러';
         return res.json({result:2,msg:msg});
     });
@@ -280,7 +280,7 @@ app.post('/add',function(req,res){
 
 app.post('/update',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ UPDATE ] ';
-    console.log(apiName);
+    // console.log(apiName);
     let errMsg = '';
     let mystate = '수정';
     let pid = req.body.pid?req.body.pid:false;
@@ -293,7 +293,7 @@ app.post('/update',function(req,res){
     // 해당 팀원 추가 로그
 
     if((!pid)||!(title||desc||dueDate||removeTeam||addTeam)){
-        console.log(apiName+'parameter check error');
+        // console.log(apiName+'parameter check error');
         return res.json({result:3,msg:'입력값을 확인하세요.'});
     }
     
@@ -308,11 +308,11 @@ app.post('/update',function(req,res){
     )
     .then(async (project)=>{
         log.user = project.manager;
-        console.log(project);
+        // console.log(project);
         if(!project){
-            console.log(apiName+'project find error');
+            // console.log(apiName+'project find error');
             errMsg ='프로젝트를 찾을 수 없습니다';
-            throw new Error();
+            throw new Error('no project');
         }
         if(title){ // 제목 변경
             log.project = project._id;            
@@ -347,8 +347,8 @@ app.post('/update',function(req,res){
                 id:1,name:1
             },function(err,user){
                 if(err){
-                    console.log(apiName+'user find error');                    
-                    throw new Error();
+                    // console.log(apiName+'user find error');                    
+                    throw new Error('user find err');
                 }
                 return user;
             });
@@ -368,8 +368,8 @@ app.post('/update',function(req,res){
                 id:1,name:1
             },function(err,user){
                 if(err){
-                    console.log(apiName+'user find error');                    
-                    throw new Error();
+                    // console.log(apiName+'user find error');                    
+                    throw new Error('user find err');
                 }            
                 return user;
             })
@@ -386,14 +386,14 @@ app.post('/update',function(req,res){
     })
     .then((result)=>{
         if(!result){
-            console.log(apiName+'project save error');
-            throw new Error();
+            // console.log(apiName+'project save error');
+            throw new Error('project save err');
         }
-        console.log(apiName+' project update complete');
+        // console.log(apiName+' project update complete');
         return res.json({result:1,msg:'프로젝트가 수정되었습니다.',data:result})
     })
     .catch(e=>{
-        console.log(e);
+        // console.log(e);
         let msg = errMsg!==''?errMsg:'서버에러';
         return res.json({result:2,msg:msg});
     })
@@ -401,7 +401,7 @@ app.post('/update',function(req,res){
 
 app.post('/delete',function(req,res){
     const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ DELETE ] ';
-    console.log(apiName);
+    // console.log(apiName);
     let pid = req.body.pid?req.body.pid:false;
     let manager = req.body.manager?req.body.manager:false;
     let taskList = [];
@@ -414,35 +414,36 @@ app.post('/delete',function(req,res){
     log.sector = 'project';
     log.user = manager;
 
-    Project.findOne({_id:mongoose.Types.ObjectId(pid),manager:manager})
+    Project.findOne({_id:mongoose.Types.ObjectId(pid),manager:mongoose.Types.ObjectId(manager)})
     .populate({path:'taskList',model:'task'})
     .then((project)=>{
         log.title = project.title + ' ' + project.desc;
         taskList = project.taskList;
-        taskList.map((t)=>{
+        
+        taskList.map((t)=>{            
             doList.push(...t.doList);
         })
         return Task.remove({_id:{
-            $in:taskList.map(t=>mongoose.Types.ObjectId(t))
+            $in:taskList.map(t=>mongoose.Types.ObjectId(t._id))
         }})
     })
     .then(result=>{
-        console.log('==== task list delete result ====',result);
+        // console.log('==== task list delete result ====',result);
         return Do.remove({_id:{
-            $in:doList.map(d=>mongoose.Types.ObjectId(d))
+            $in:doList.map(d=>mongoose.Types.ObjectId(d._id))
         }})
     })
     .then(result=>{
-        console.log('==== do list delete result ====',result);        
-        return Project.remove({_id:mongoose.Types.ObjectId(pid),manager:manager});        
+        // console.log('==== do list delete result ====',result);        
+        return Project.remove({_id:mongoose.Types.ObjectId(pid),manager:mongoose.Types.ObjectId(manager)});        
     })
     .then(result=>{
-        console.log(apiName+' project has been removed.');  
+        // console.log(apiName+' project has been removed.');  
         log.save();
         return res.json({result:1,msg:'프로젝트가 삭제되었습니다.',data:result});
     })    
     .catch(e=>{
-        console.log(e);
+        // console.log(e);
         let msg = errMsg!==''?errMsg:'서버에러';
         return res.json({result:2,msg:msg});
     });
@@ -450,13 +451,13 @@ app.post('/delete',function(req,res){
 
 app.post('/timechk',function(req,res){
     const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ TIME CHECK ] ';
-    console.log(apiName);
+    // console.log(apiName);
     let pid = req.body.pid?req.body.pid:false;
     let cTime = req.body.cTime?req.body.cTime:false;
     let errMsg = '';
 
     if(!(pid&&cTime)){
-        console.log(apiName+'parameter check error');
+        // console.log(apiName+'parameter check error');
         return res.json({result:3,msg:'모든 정보를 입력하세요.'});
     }
     Project.count({
@@ -467,12 +468,12 @@ app.post('/timechk',function(req,res){
     })
     .then((cnt)=>{
         if(!cnt){ // 변경사항 없는것
-            console.log(apiName+' no change');
+            // console.log(apiName+' no change');
             // return res.json({result:1,msg:'업데이트 없음'});
             errMsg = '업데이트 없음';
-            throw new Error();
+            throw new Error('no update');
         }else{
-            console.log(apiName+ ' update');
+            // console.log(apiName+ ' update');
             return Project.findOne({_id:pid})
             .populate({path:'manager',select:'name id email'})
             .populate({path:'team',select:'name id email'})
@@ -482,17 +483,17 @@ app.post('/timechk',function(req,res){
     })
     .then((project)=>{
         if(!project){
-            console.log(apiName+'project find error');
+            // console.log(apiName+'project find error');
             errMsg ='프로젝트를 찾을 수 없습니다';
-            throw new Error();
+            throw new Error('no project');
         }
-        console.log(apiName+' found updated project info');
+        // console.log(apiName+' found updated project info');
         return res.json({result:7,msg:'업데이트 완료',data:project});
     })
     .catch((e)=>{        
         let result = errMsg==='업데이트 없음'?1:2;
         let msg = errMsg!==''?errMsg:'서버에러';
-        console.log(apiName+'project error catch',e);
+        // console.log(apiName+'project error catch',e);
         return res.json({result:result,msg:msg});
     });
 })
