@@ -127,7 +127,6 @@ app.post('/update',function(req,res){
     let state = req.body.state?req.body.state:false;
     let updateQuery = {}    
     let mystate = '수정';
-    
     if(title){
         Object.assign(updateQuery,{title:title});    
     }
@@ -141,7 +140,7 @@ app.post('/update',function(req,res){
             Object.assign(updateQuery,{state:state,doneDate:doneDate});
         }else{
             Object.assign(updateQuery,{state:state});
-        }
+        }       
     }
     if(!((uid&&tid)&&(title||desc||state))){
         console.log(apiName+'parameter check error');
@@ -183,6 +182,7 @@ app.post('/update',function(req,res){
         Project.findOneAndUpdate({
             _id:mongoose.Types.ObjectId(task.project)
         },{
+            $set:{lastUpdate:new Date()},
             $push:{logList:log._id}
         },function(err,ret){
             if(err)return res.json({result:2,msg:'태스크 업데이트 실패',data:task});
@@ -226,6 +226,7 @@ app.post('/delete',function(req,res){
         Project.findOneAndUpdate({
             _id:mongoose.Types.ObjectId(task.project)
         },{
+            $set:{lastUpdate:new Date()},
             $push:{logList:log._id}
         });
         // if(!result.n){

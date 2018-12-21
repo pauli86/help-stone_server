@@ -67,6 +67,7 @@ app.post('/add',function(req,res){
         Project.findOneAndUpdate({
             _id:mongoose.Types.ObjectId(task.project)
         },{
+            $set:{lastUpdate:new Date()},
             $push:{logList:log._id}
         },function(err){
             if(err)console.log(apiName+'project log find and update error');
@@ -105,7 +106,7 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
     }
     if(state){
         if(state==='done'){
-            Object.assign(query,{doneDate:new Date()});
+            Object.assign(query,{state:state,doneDate:new Date()});
             mystate = '완료';
         }else{
             Object.assign(query,{state:state});
@@ -144,6 +145,7 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
         return Project.updateOne({
             _id:mongoose.Types.ObjectId(todo.project)
         },{
+            $set:{lastUpdate:new Date()},
             $push:{logList:log._id}
         })
     })
@@ -194,6 +196,7 @@ app.post('/delete',function(req,res){ // Do collection 에서 지우고 로그 �
         return Project.updateOne({
             _id:mongoose.Types.ObjectId(todo.project)
         },{
+            $set:{lastUpdate:new Date()},
             $push:{logList:log._id}
         })
 
