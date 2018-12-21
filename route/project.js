@@ -469,27 +469,28 @@ app.post('/timechk',function(req,res){
     .then((cnt)=>{
         if(!cnt){ // 변경사항 없는것
             // console.log(apiName+' no change');
-            // return res.json({result:1,msg:'업데이트 없음'});
-            errMsg = '업데이트 없음';
-            throw new Error('no update');
+            return res.json({result:1,msg:'업데이트 없음'});
+            // errMsg = '업데이트 없음';
+            // throw new Error('no update');
         }else{
             // console.log(apiName+ ' update');
-            return Project.findOne({_id:pid})
-            .populate({path:'manager',select:'name id email'})
-            .populate({path:'team',select:'name id email'})
-            .populate({path:'taskList',model:'task'})
-            .populate({path:'logList',model:'log'})
+            return res.json({result:7,msg:'업데이트 있음'});
+            // return Project.findOne({_id:pid})
+            // .populate({path:'manager',select:'name id email'})
+            // .populate({path:'team',select:'name id email'})
+            // .populate({path:'taskList',model:'task'})
+            // .populate({path:'logList',model:'log'})
         }
     })
-    .then((project)=>{
-        if(!project){
-            // console.log(apiName+'project find error');
-            errMsg ='프로젝트를 찾을 수 없습니다';
-            throw new Error('no project');
-        }
-        // console.log(apiName+' found updated project info');
-        return res.json({result:7,msg:'업데이트 완료',data:project});
-    })
+    // .then((project)=>{
+    //     if(!project){
+    //         // console.log(apiName+'project find error');
+    //         errMsg ='프로젝트를 찾을 수 없습니다';
+    //         throw new Error('no project');
+    //     }
+    //     // console.log(apiName+' found updated project info');
+        
+    // })
     .catch((e)=>{        
         let result = errMsg==='업데이트 없음'?1:2;
         let msg = errMsg!==''?errMsg:'서버에러';
