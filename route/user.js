@@ -87,6 +87,7 @@ app.post('/login',function(req,res){
             if(err) throw new Error({msg:'암호화 에러'});
             if(key.toString('base64')===user.pass){
                 console.log(apiName+'login well');
+                console.log('[[[[  USER\'s LAST UPDATE ]]]]]',user.lastUpdate);
                 return res.json({result:1,msg:'로그인 되었습니다.',data:user});
             }
             console.log(apiName+'wrong id or password');
@@ -210,14 +211,32 @@ app.post('/projectChk',function(req,res){
         console.log(apiName+'parameter error ',req.body);
         return res.json({result:3,msg:'파라미터가 없습니다.'});
     }
-    User.count({id:id,lastUpdate:{$gt:lastUpdate}})
-    .then(cnt=>{
-        if(!cnt){
+    let userFlag = false;
+    let projectFlag = false;
+    User.findOne({id:id})
+    .then(user=>{
+        if(user.lastUpdate>lastUpdate){
+            userFlag=true;
+        }
+        return Project.count({
+            _id:{
+                $in:user.projectList.map(function(o){
+                    return mongoose.Types.ObjectId(o);
+                })
+            },
+            lastUpdate:{$gt:new Date(lastUpdate)}
+        })
+    })
+    .then(newProjectCount=>{
+        if(newProjectCount){
+            projectFlag = true;
+        }
+        if(!(projectFlag&&userFlag)){
             return res.json({result:1,msg:'변경사항없음'});
         }else{
-            return res.json({result:4,msg:'새로운 프로젝트가 프로젝트 리스트에 추가되었습니다.'});
+            return res.json({result:4,msg:'새로운 프로젝트가 프로젝트 리스트에 추가 또는 프로젝트 리스트중의 프로젝트가 갱신 되었습니다.'});
         }
-    })
+    })    
     .catch(e=>{
         console.log(apiName+'error : ',e);
         return res.json({result:5,msg:'서버에러'});
