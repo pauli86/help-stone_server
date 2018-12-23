@@ -9,6 +9,7 @@ const logSchema = new Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'project'
     },
+    xTask:String,
     task:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'task'

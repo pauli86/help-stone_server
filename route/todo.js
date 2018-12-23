@@ -53,6 +53,7 @@ app.post('/add',function(req,res){
         todo.save();
 
         log.project = task.project;
+        log.xTask = task.title;
         log.task = task._id;
         log.user = task.user;
         
@@ -104,6 +105,7 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
     let flag ='';
     let query = {};
     let content = '';
+    let todo = {};
     if(title){
         Object.assign(query,{title:title})
         flag = 'title';
@@ -123,21 +125,33 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
     },{
         $set:query
     })
-    .then(todo=>{
+    .then(itodo=>{
         
         switch(flag){
             case 'title':
-                content = todo.title + ' -> ' + title;
+                content = 'DO : ' +itodo.title + ' -> ' + title;
                 break;
             case 'state':
-                content = todo.title+' : ' + todo.state + ' -> ' + state;
+                content = itodo.title;
+                if(state==='done'){
+                    mystate = ' 완료';
+                }else{
+                    mystate = ' 완료취소';
+                }
                 break;
         }
+        Object.assign(todo,itodo._doc);
+        return Task.findOne({
+            _id:mongoose.Types.ObjectId(itodo.task)
+        })
+    })
+    .then(task=>{
         let log = new Log();
         log.do = todo._id;
         log.project = todo.project;
         log.user = todo.user;
         log.task = todo.task;
+        log.xTask = task.title?task.title:'';
         log.sector = 'do';
         log.title = content;
         log.action = mystate;
@@ -146,6 +160,7 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
         ret.prev = todo;
         ret.query = query;
         ret.log = log;
+
         return Project.updateOne({
             _id:mongoose.Types.ObjectId(todo.project)
         },{
@@ -158,13 +173,13 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
         if(!result){
             // console.log(apiName+' todo update error');            
             throw new Error();
-        }
+        }        
         // console.log(apiName+' todo update complete');
         return res.json({result:1,msg:'할일 업데이트 완료',data:ret});
     })
     .catch((e)=>{        
         let msg = errMsg!==''?errMsg:'서버에러';
-        // console.log(apiName+'todo error catch',e);
+        console.log(apiName+'todo error catch',e);
         return res.json({result:2,msg:msg});
     });
     
@@ -175,7 +190,7 @@ app.post('/delete',function(req,res){ // Do collection 에서 지우고 로그 �
     // console.log(apiName);
     let did = req.body.did?req.body.did:false;
     let mystate = '삭제';    
-
+    let global_todo ={};
     if(!(did)){
         // console.log(apiName+'project find error');
         errMsg ='프로젝트를 찾을 수 없습니다';
@@ -187,18 +202,25 @@ app.post('/delete',function(req,res){ // Do collection 에서 지우고 로그 �
         _id:mongoose.Types.ObjectId(did)
     })
     .then(todo=>{
+        Object.assign(global_todo,todo._doc);
+        return Task.findOne({
+            _id:mongoose.Types.ObjectId(todo.task)
+        })
+    })
+    .then(task=>{
         let log = new Log();
-        log.do = todo._id;
-        log.task = todo.task;
-        log.project = todo.project;
-        log.user = todo.user;
+        log.do = global_todo._id;
+        log.xTask = task.title;
+        log.task = global_todo.task;
+        log.project = global_todo.project;
+        log.user = global_todo.user;
         log.sector = 'do';
-        log.title = todo.title;
+        log.title = global_todo.title;
         log.action = mystate;
-        log.date = new Date();
+        log.date = new Date();        
         log.save();
         return Project.updateOne({
-            _id:mongoose.Types.ObjectId(todo.project)
+            _id:mongoose.Types.ObjectId(global_todo.project)
         },{
             $set:{lastUpdate:new Date()},
             $push:{logList:log._id}
@@ -216,7 +238,7 @@ app.post('/delete',function(req,res){ // Do collection 에서 지우고 로그 �
     })
     .catch((e)=>{        
         let msg = errMsg!==''?errMsg:'서버에러';
-        // console.log(apiName+'todo error catch',e);
+        console.log(apiName+'todo error catch',e);
         return res.json({result:2,msg:msg});
     });
 

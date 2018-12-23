@@ -134,11 +134,12 @@ app.post('/resetPW',function(req,res){
     let stuNo = req.body.stuNo?req.body.stuNo:false;
     let name = req.body.name?req.body.name:false;
     let pass = req.body.pw?req.body.pw:false;
-    id = id.toLowerCase();
+    
     if(!(id&&stuNo&&name&&pass)){
         // console.log(apiName+'parameter check error');
         return res.json({result:3,msg:'모든 정보를 입력하세요.'});
     }
+    id = (id+'').toLowerCase();
     crypto.randomBytes(64, (err, buf) => {
         if(err){
             // console.log(apiName+'crypto random bytes error');

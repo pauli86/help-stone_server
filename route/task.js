@@ -160,12 +160,15 @@ app.post('/update',function(req,res){
         let updateFlag = Object.keys(updateQuery)[0];
         switch(updateFlag){
             case 'state':
-            content = '상태 : '+ task.state + ' -> ' +state;
+            content =  task.title;
             task.state = state;            
             break;
             case 'title':
             content = '태스크명 : '+ task.title + ' -> ' +title;
             task.title = title;
+            if(Object.keys(updateQuery)[1]==='desc'){
+                content += '\n설명 : '+ task.desc + ' -> ' +desc;
+            }
             break;
             case 'desc':
             content = '설명 : '+ task.desc + ' -> ' +desc;
@@ -225,12 +228,26 @@ app.post('/delete',function(req,res){
         log.title = task.title;
         log.action = mystate;
         log.date = new Date();
-        log.save();        
+        console.log('task has been removed',task);
+        console.log('log will be saved',log);
+        log.save(function(err){
+            if(err){
+                console.log('log save err',err);
+            }else{
+                console.log('log save well');
+            }
+        });        
         Project.findOneAndUpdate({
             _id:mongoose.Types.ObjectId(task.project)
         },{
             $set:{lastUpdate:new Date()},
             $push:{logList:log._id}
+        },function(err,doc){
+            if(err){
+                console.log('project find and update err',err);
+            }else{
+                console.log('project save well',doc);
+            }
         });
         // if(!result.n){
         //     // console.log(apiName+'not found',result);
