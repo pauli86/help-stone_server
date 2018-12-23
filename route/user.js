@@ -6,7 +6,7 @@ const User = require('../models/user');
 const Project = require('../models/project');
 
 app.post('/join',function(req,res){
-    const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ JOIN ] ';
+    // const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ JOIN ] ';
     // console.log(apiName);
     let id = req.body.id?req.body.id:false;    
     let pass = req.body.pass?req.body.pass:false;
@@ -58,7 +58,7 @@ app.post('/join',function(req,res){
 });
 
 app.post('/login',function(req,res){
-    const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ LOGIN ] ';
+    // const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ LOGIN ] ';
     // console.log(apiName);
     let id = req.body.id?req.body.id:false;
     let pass = req.body.pass?req.body.pass:false;
@@ -104,7 +104,7 @@ app.post('/login',function(req,res){
 
 
 app.post('/findId',function(req,res){
-    const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ FIND ID ] ';
+    // const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ FIND ID ] ';
     // console.log(apiName);
     let name = req.body.name?req.body.name:false;
     let stuNo = req.body.stuNo?req.body.stuNo:false;
@@ -128,7 +128,7 @@ app.post('/findId',function(req,res){
 });
 
 app.post('/resetPW',function(req,res){
-    const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ RESET PASSWORD ] ';
+    // const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ RESET PASSWORD ] ';
     // console.log(apiName);
     let id = req.body.id?req.body.id:false;
     let stuNo = req.body.stuNo?req.body.stuNo:false;
@@ -170,7 +170,7 @@ app.post('/resetPW',function(req,res){
 });
 
 app.post('/view',function(req,res){
-    const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ RESET PASSWORD ] ';
+    // const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ RESET PASSWORD ] ';
     // console.log(apiName);
     let manager = req.body.manager?req.body.manager:false;
     let id = req.body.id?req.body.id:false;
@@ -205,7 +205,7 @@ app.post('/view',function(req,res){
 })
 
 app.post('/projectChk',function(req,res){
-    const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ PROJECT CHECK ] ';
+    // const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ USER ][ PROJECT CHECK ] ';
     // console.log(apiName);
     let id = req.body.id?req.body.id:false;
     let lastUpdate = req.body.lastUpdate?req.body.lastUpdate:false;

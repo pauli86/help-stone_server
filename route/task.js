@@ -12,7 +12,7 @@ const Log = require('../models/log');
 
 
 app.post('/add',function(req,res){
-    const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ ADD ] ';
+    // const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ ADD ] ';
     // console.log(apiName);
     let errMsg = '';
     let title = req.body.title?req.body.title:false;
@@ -93,7 +93,7 @@ app.post('/add',function(req,res){
 });
 
 app.post('/view',function(req,res){
-    const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ VIEW ] ';
+    // const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ VIEW ] ';
     // console.log(apiName);
     let errMsg = '';    
     let uid = req.body.uid?req.body.uid:false;
@@ -120,7 +120,7 @@ app.post('/view',function(req,res){
 });
 
 app.post('/update',function(req,res){
-    const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ UPDATE ] ';
+    // const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ UPDATE ] ';
     // console.log(apiName);
     let errMsg = '';    
     let uid = req.body.uid?req.body.uid:false;
@@ -204,7 +204,7 @@ app.post('/update',function(req,res){
 });
 
 app.post('/delete',function(req,res){
-    const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ DELETE ] ';
+    // const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ TASK ][ DELETE ] ';
     // console.log(apiName);
     let errMsg = '';    
     let mystate = '삭제';

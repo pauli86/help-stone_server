@@ -11,7 +11,7 @@ const Do = require('../models/todo');
 const Log = require('../models/log');
 
 app.post('/add',function(req,res){
-    const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ DO ][ ADD ] ';
+    // const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ DO ][ ADD ] ';
     // console.log(apiName);
     let errMsg = '';    
     let mystate = '추가';
@@ -88,7 +88,7 @@ app.post('/add',function(req,res){
 })
 
 app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일경우 done date
-    const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ DO ][ UPDATE ] ';
+    // const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ DO ][ UPDATE ] ';
     // console.log(apiName);
     let errMsg = '';    
     let did = req.body.did?req.body.did:false;    
@@ -186,7 +186,7 @@ app.post('/update',function(req,res){ // 프로젝트에 로그, state->done일�
 })
 
 app.post('/delete',function(req,res){ // Do collection 에서 지우고 로그 남기기
-    const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ DO ][ DELETE ] ';
+    // const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ DO ][ DELETE ] ';
     // console.log(apiName);
     let did = req.body.did?req.body.did:false;
     let mystate = '삭제';    

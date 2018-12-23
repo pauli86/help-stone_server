@@ -9,7 +9,7 @@ const Log = require('../models/log');
 const Do = require('../models/todo');
 
 app.post('/viewAll',function(req,res){
-    const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ VIEW ALL ] ';
+    // const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ VIEW ALL ] ';
     // console.log(apiName);
     let uid = req.body.uid?req.body.uid:false;
     let data = {
@@ -95,7 +95,7 @@ app.post('/viewAll',function(req,res){
 });
 
 app.post('/view',function(req,res){
-    const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ VIEW ] ';
+    // const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ VIEW ] ';
     // console.log(apiName);    
     let pid = req.body.pid?req.body.pid:false;
     let data = {};
@@ -184,7 +184,7 @@ app.post('/view',function(req,res){
 })
 
 app.post('/add',function(req,res){
-    const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ ADD ] ';
+    // const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ ADD ] ';
     // console.log(apiName);
     let mystate = '생성';
     let errMsg = '';
@@ -279,9 +279,9 @@ app.post('/add',function(req,res){
 });
 
 app.post('/update',function(req,res){
-    const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ UPDATE ] ';
+    // const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ UPDATE ] ';
     // console.log(apiName);
-    console.log(req.body);
+    //console.log(req.body);
     let errMsg = '';
     let mystate = '수정';
     let pid = req.body.pid?req.body.pid:false;
@@ -401,7 +401,7 @@ app.post('/update',function(req,res){
 })
 
 app.post('/delete',function(req,res){
-    const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ DELETE ] ';
+    // const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ DELETE ] ';
     // console.log(apiName);
     let pid = req.body.pid?req.body.pid:false;
     let manager = req.body.manager?req.body.manager:false;
@@ -451,7 +451,7 @@ app.post('/delete',function(req,res){
 });
 
 app.post('/timechk',function(req,res){
-    const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ TIME CHECK ] ';
+    // const apiName = '['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ TIME CHECK ] ';
     // console.log(apiName);
     let pid = req.body.pid?req.body.pid:false;
     let cTime = req.body.cTime?req.body.cTime:false;

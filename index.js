@@ -8,8 +8,8 @@ app.use(bodyParser.json({limit:'50mb'}));
 app.use(bodyParser.urlencoded({limit:'50mb',extended:true,parameterLimit:50000}));
 
 app.all('/*',function(req,res,next){
-    const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ API SERVER ]';
-    console.log(apiName);
+    //const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ API SERVER ]';
+    //console.log(apiName);
     res.header('Access-Control-Allow-Origin','*');
     res.header('Access-Control-Allow-Method','POST');
     res.header('Access-Control-Allow-Headers','X-Requested-With,Content-Type');
