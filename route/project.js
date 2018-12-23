@@ -281,6 +281,7 @@ app.post('/add',function(req,res){
 app.post('/update',function(req,res){
     const apiName ='['+(Date().toLocaleString()).split(' GMT')[0]+'][ PROJECT ][ UPDATE ] ';
     // console.log(apiName);
+    console.log(req.body);
     let errMsg = '';
     let mystate = '수정';
     let pid = req.body.pid?req.body.pid:false;
